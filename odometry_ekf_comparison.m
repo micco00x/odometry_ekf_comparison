@@ -6,7 +6,7 @@ close all
 simulation_duration = 25.0; % [s]
 sampling_interval = 0.001; % [s]
 iterations = simulation_duration / sampling_interval;
-measurement_type = MeasurementType.Bearing; % Bearing or Distance
+measurements_type = [MeasurementType.Bearing; MeasurementType.Distance; MeasurementType.Bearing; MeasurementType.Distance]; % Bearing or Distance
 
 % Initial configuration of the unicycle:
 unicycle_configuration = zeros(3, 1); % [m], [m], [rad]
@@ -15,14 +15,18 @@ unicycle_configuration = zeros(3, 1); % [m], [m], [rad]
 control_input = [1.0; 0.0]; % [m/s], [rad/s]
 
 % Position of the landmark:
-landmark_position = [7.0, 3.0];
+landmarks_position = [[7.0, 3.0]; [7.0, 3.0]; [19.0, -4.0]; [19.0, -4.0]];
+
+% ASSERT: double check sizes.
+num_measurements = size(measurements_type, 1);
+assert(size(measurements_type, 1) == size(landmarks_position, 1));
 
 % Odometric localization and EKF data:
 unicycle_configuration_estimated_with_odometry = unicycle_configuration;
 unicycle_configuration_estimated_with_ekf = unicycle_configuration;
 unicycle_covariance_ekf = 0.1 * eye(3, 3);
 process_noise_covariance = diag([1e-5, 1e-5, 1e-7]);
-measurement_noise_covariance = zeros(1, 1);
+measurements_noise_covariance = zeros(num_measurements);
 
 % Variables to be used for plotting:
 time = linspace(0.0, iterations * sampling_interval, iterations);
@@ -52,12 +56,17 @@ for iter = 1:iterations
     unicycle_configuration_estimated_with_odometry = odometric_localization(unicycle_configuration_estimated_with_odometry, control_input, sampling_interval);
 
     % EKF localization:
-    if measurement_type == MeasurementType.Bearing
-        measurement = measure_bearing(unicycle_configuration, landmark_position);
-    else
-        measurement = measure_distance(unicycle_configuration, landmark_position);
+    measurements = zeros(num_measurements, 1);
+    for k = 1:num_measurements
+        if measurements_type(k) == MeasurementType.Bearing
+            % MeasurementType.Bearing
+            measurements(k) = measure_bearing(unicycle_configuration, landmarks_position(k, :));
+        else
+            % MeasurementType.Distance
+            measurements(k) = measure_distance(unicycle_configuration, landmarks_position(k, :));
+        end
     end
-    unicycle_configuration_estimated_with_ekf = EKF(unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf, control_input, sampling_interval, process_noise_covariance, landmark_position, measurement, measurement_noise_covariance, measurement_type);
+    unicycle_configuration_estimated_with_ekf = EKF(unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf, control_input, sampling_interval, process_noise_covariance, landmarks_position, measurements, measurements_noise_covariance, measurements_type);
 
     % Log:
     x(iter) = unicycle_configuration(1);
@@ -89,7 +98,7 @@ plot_configuration_comparison(time, x, y, theta, x_ekf, y_ekf, theta_ekf, 'groun
 % Unicycle plot:
 num_unicycles_to_draw = 10;
 figure
-scatter(landmark_position(1), landmark_position(2));
+scatter(landmarks_position(:, 1), landmarks_position(:, 2));
 hold on
 draw_unicycle_from_trajectory(x, y, theta, num_unicycles_to_draw, 'black');
 hold on
