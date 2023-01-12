@@ -6,7 +6,7 @@ close all
 simulation_duration = 25.0; % [s]
 sampling_interval = 0.001; % [s]
 iterations = simulation_duration / sampling_interval;
-measurement_type = 'BearingMeasurement'; % DistanceMeasurement or BearingMeasurement
+measurement_type = MeasurementType.Bearing; % Bearing or Distance
 
 % Initial configuration of the unicycle:
 unicycle_configuration = zeros(3, 1); % [m], [m], [rad]
@@ -52,13 +52,12 @@ for iter = 1:iterations
     unicycle_configuration_estimated_with_odometry = odometric_localization(unicycle_configuration_estimated_with_odometry, control_input, sampling_interval);
 
     % EKF localization:
-    if strcmp(measurement_type, 'BearingMeasurement') == 1
+    if measurement_type == MeasurementType.Bearing
         measurement = measure_bearing(unicycle_configuration, landmark_position);
-        unicycle_configuration_estimated_with_ekf = EKF(unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf, control_input, sampling_interval, process_noise_covariance, landmark_position, measurement, measurement_noise_covariance, 'BearingMeasurement');
     else
         measurement = measure_distance(unicycle_configuration, landmark_position);
-        unicycle_configuration_estimated_with_ekf = EKF(unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf, control_input, sampling_interval, process_noise_covariance, landmark_position, measurement, measurement_noise_covariance, 'DistanceMeasurement');
     end
+    unicycle_configuration_estimated_with_ekf = EKF(unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf, control_input, sampling_interval, process_noise_covariance, landmark_position, measurement, measurement_noise_covariance, measurement_type);
 
     % Log:
     x(iter) = unicycle_configuration(1);
