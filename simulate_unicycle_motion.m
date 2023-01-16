@@ -24,5 +24,5 @@ function [unicycle_configuration, process_noise] = simulate_unicycle_motion(unic
     process_noise = mvnrnd(zeros(3, 1), process_noise_covariance);
     unicycle_configuration(1) = unicycle_configuration(1) + process_noise(1);
     unicycle_configuration(2) = unicycle_configuration(2) + process_noise(2);
-    unicycle_configuration(3) = wrap_angle(unicycle_configuration(3) + process_noise(3));
+    unicycle_configuration(3) = wrapToPi(unicycle_configuration(3) + process_noise(3));
 end
