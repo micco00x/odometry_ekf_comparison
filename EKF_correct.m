@@ -11,7 +11,7 @@ function [unicycle_configuration_corrected, unicycle_covariance_corrected] = EKF
         y_l = landmarks_position(k, 2);
         if measurements_type(k) == MeasurementType.Bearing
             % MeasurementType.Bearing
-            innovation(k) = measurements(k) - compute_bearing(unicycle_configuration_predicted, landmarks_position(k, :));
+            innovation(k) = wrap_angle(measurements(k) - compute_bearing(unicycle_configuration_predicted, landmarks_position(k, :)));
             H(k, :) = [ (y_l - y) / ((x_l - x) ^ 2 + (y_l - y) ^ 2), ...
                        -(x_l - x) / ((x_l - x) ^ 2 + (y_l - y) ^ 2), ...
                        -1];
