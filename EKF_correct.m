@@ -22,11 +22,9 @@ function [unicycle_configuration_corrected, unicycle_covariance_corrected] = EKF
                        (y - y_l) / sqrt((x - x_l) ^ 2 + (y - y_l) ^ 2), ...
                        0];
         end
-        
     end
     % Correct computing innovation and kalman gain matrix:
-    damp = 1e-4 * eye(num_measurements);
-    kalman_gain_matrix = unicycle_covariance_predicted * H' * inv(H * unicycle_covariance_predicted * H' + measurements_noise_covariance + damp);
+    kalman_gain_matrix = unicycle_covariance_predicted * H' * inv(H * unicycle_covariance_predicted * H' + measurements_noise_covariance);
     unicycle_configuration_corrected = unicycle_configuration_predicted + kalman_gain_matrix * innovation;
     unicycle_configuration_corrected(3) = wrap_angle(unicycle_configuration_corrected(3));
     unicycle_covariance_corrected = unicycle_covariance_predicted - kalman_gain_matrix * H * unicycle_covariance_predicted;

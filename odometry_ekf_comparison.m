@@ -24,9 +24,21 @@ assert(size(measurements_type, 1) == size(landmarks_position, 1));
 % Odometric localization and EKF data:
 unicycle_configuration_estimated_with_odometry = unicycle_configuration;
 unicycle_configuration_estimated_with_ekf = unicycle_configuration;
-unicycle_covariance_ekf = 0.1 * eye(3, 3);
-process_noise_covariance = diag([1e-5, 1e-5, 1e-7]);
+unicycle_covariance_ekf = 1e-3 * eye(3, 3);
+process_noise_covariance = diag([1e-6, 1e-6, 1e-7]);
+bearing_measurement_noise_covariance = 1e-5;
+distance_measurement_noise_covariance = 1e-4;
 measurements_noise_covariance = zeros(num_measurements);
+for k = 1:num_measurements
+    if measurements_type(k) == MeasurementType.Bearing
+        % MeasurementType.Bearing
+        measurements_noise_covariance(k, k) = bearing_measurement_noise_covariance;
+    else
+        % MeasurementType.Distance
+        measurements_noise_covariance(k, k) = distance_measurement_noise_covariance;
+    end
+end
+
 
 % Variables to be used for plotting:
 time = linspace(0.0, iterations * sampling_interval, iterations);
@@ -66,7 +78,9 @@ for iter = 1:iterations
             measurements(k) = measure_distance(unicycle_configuration, landmarks_position(k, :));
         end
     end
-    unicycle_configuration_estimated_with_ekf = EKF(unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf, control_input, sampling_interval, process_noise_covariance, landmarks_position, measurements, measurements_noise_covariance, measurements_type);
+    measurements_noise = mvnrnd(zeros(num_measurements, 1), measurements_noise_covariance);
+    measurements = measurements + measurements_noise;
+    [unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf] = EKF(unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf, control_input, sampling_interval, process_noise_covariance, landmarks_position, measurements, measurements_noise_covariance, measurements_type);
 
     % Log:
     x(iter) = unicycle_configuration(1);
