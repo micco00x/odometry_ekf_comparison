@@ -1,4 +1,10 @@
-function plot_configuration_comparison(time, x_ref, y_ref, theta_ref, x_est, y_est, theta_est, legend_ref_name, legend_est_name)
+function plot_configuration_comparison(time, unicycle_configurations_ref, unicycle_configurations_est, legend_ref_name, legend_est_name)
+    x_ref = unicycle_configurations_ref(:, 1);
+    y_ref = unicycle_configurations_ref(:, 2);
+    theta_ref = unicycle_configurations_ref(:, 3);
+    x_est = unicycle_configurations_est(:, 1);
+    y_est = unicycle_configurations_est(:, 2);
+    theta_est = unicycle_configurations_est(:, 3);
     subplot(3, 1, 1);
     plot(time, x_ref, time, x_est);
     title(legend_est_name);

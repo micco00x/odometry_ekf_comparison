@@ -1,6 +1,7 @@
-% Draw the unicycle moving along a trajectory specified by vectors x, y,
-% theta.
-function  draw_unicycle_from_trajectory(x, y, theta, num_unicycles_to_draw, color)
+function  draw_unicycle_from_trajectory(unicycle_configurations, num_unicycles_to_draw, color)
+    x = unicycle_configurations(:, 1);
+    y = unicycle_configurations(:, 2);
+    theta = unicycle_configurations(:, 3);
     N = size(x);
     skip = fix(N / num_unicycles_to_draw);
     for k = 1:skip:N
