@@ -1,37 +1,42 @@
+% Clean workspace:
 clc
 clear
 close all
 
 % Simulation hparams:
+rng(1) % use a seed (non-negative number of 'default')
 simulation_duration = 25.0; % [s]
-sampling_interval = 0.01; % [s]
+sampling_interval = 0.1; % [s]
+num_unicycles_to_draw = 20;
+
+unicycle_covariance_ekf = 1e-3 * eye(3, 3);
+process_noise_covariance = diag([1e-5, 1e-5, 1e-4]);
+bearing_measurement_noise_covariance = 1e-5;
+distance_measurement_noise_covariance = 1e-5;
+
 iterations = simulation_duration / sampling_interval;
 
 % Initial configuration of the unicycle:
 unicycle_configuration = zeros(3, 1); % [m], [m], [rad]
 
 % Commands to be applied to the unicycle:
-control_input = [1.0; 0.2]; % [m/s], [rad/s]
+control_input = [2.0; 0.2]; % [m/s], [rad/s]
 
 % Position of the landmarks:
-landmarks = [[7.0, 3.0]; [-2.0, 5.0]];
+landmarks = [[4.0, 5.0]; [-8.0, 20.0]];
 
 % Measurements type and relative landmarks:
 measurements_info = [
     MeasurementInfo(1, MeasurementType.Bearing); ...
     MeasurementInfo(1, MeasurementType.Distance); ...
-    MeasurementInfo(2, MeasurementType.Bearing); ...
-    MeasurementInfo(2, MeasurementType.Distance)
+    %MeasurementInfo(2, MeasurementType.Bearing); ...
+    %MeasurementInfo(2, MeasurementType.Distance)
 ];
 num_measurements = size(measurements_info, 1);
 
 % Odometric localization and EKF data:
 unicycle_configuration_estimated_with_odometry = unicycle_configuration;
 unicycle_configuration_estimated_with_ekf = unicycle_configuration;
-unicycle_covariance_ekf = 1e-3 * eye(3, 3);
-process_noise_covariance = diag([1e-5, 1e-5, 1e-5]);
-bearing_measurement_noise_covariance = 1e-5;
-distance_measurement_noise_covariance = 1e-5;
 measurements_noise_covariance = zeros(num_measurements);
 for k = 1:num_measurements
     if measurements_info(k).type == MeasurementType.Bearing
@@ -84,9 +89,12 @@ figure
 plot_configuration_comparison(time, unicycle_configuration_log, unicycle_configuration_ekf_log, 'ground truth', 'EKF');
 
 % Unicycle plot:
-num_unicycles_to_draw = 20;
 figure
-scatter(landmarks(:, 1), landmarks(:, 2));
+measured_landmarks_id = zeros(num_measurements, 1);
+for k = 1:num_measurements
+    measured_landmarks_id(k) = measurements_info(k).landmark_id;
+end
+scatter(landmarks(measured_landmarks_id, 1), landmarks(measured_landmarks_id, 2));
 hold on
 draw_unicycle_from_trajectory(unicycle_configuration_log, num_unicycles_to_draw, 'black');
 hold on
