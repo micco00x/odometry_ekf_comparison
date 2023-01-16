@@ -12,7 +12,7 @@ measurements_type = [MeasurementType.Bearing; MeasurementType.Distance; Measurem
 unicycle_configuration = zeros(3, 1); % [m], [m], [rad]
 
 % Commands to be applied to the unicycle
-control_input = [1.0; 0.0]; % [m/s], [rad/s]
+control_input = [1.0; 0.1]; % [m/s], [rad/s]
 
 % Position of the landmark:
 landmarks_position = [[7.0, 3.0]; [7.0, 3.0]; [19.0, -4.0]; [19.0, -4.0]];
