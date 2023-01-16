@@ -63,23 +63,12 @@ theta_noise = zeros(iterations, 1);
 for iter = 1:iterations
     % Simulation step:
     [unicycle_configuration, process_noise] = simulate_unicycle_motion(unicycle_configuration, control_input, sampling_interval, process_noise_covariance);
+    [measurements, measurements_noise] = read_measurements(unicycle_configuration, landmarks_position, measurements_type, measurements_noise_covariance);
 
     % Odometric localization:
     unicycle_configuration_estimated_with_odometry = odometric_localization(unicycle_configuration_estimated_with_odometry, control_input, sampling_interval);
 
     % EKF localization:
-    measurements = zeros(num_measurements, 1);
-    for k = 1:num_measurements
-        if measurements_type(k) == MeasurementType.Bearing
-            % MeasurementType.Bearing
-            measurements(k) = measure_bearing(unicycle_configuration, landmarks_position(k, :));
-        else
-            % MeasurementType.Distance
-            measurements(k) = measure_distance(unicycle_configuration, landmarks_position(k, :));
-        end
-    end
-    measurements_noise = mvnrnd(zeros(num_measurements, 1), measurements_noise_covariance);
-    measurements = measurements + measurements_noise;
     [unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf] = EKF(unicycle_configuration_estimated_with_ekf, unicycle_covariance_ekf, control_input, sampling_interval, process_noise_covariance, landmarks_position, measurements, measurements_noise_covariance, measurements_type);
 
     % Log:
