@@ -1,4 +1,4 @@
-function [unicycle_configuration_corrected, unicycle_covariance_corrected] = EKF(unicycle_configuration_estimated, unicycle_covariance_estimated, control_input, sampling_interval, process_noise_covariance, landmarks_position, measurements, measurements_noise_covariance, measurements_type)
+function [unicycle_configuration_corrected, unicycle_covariance_corrected] = EKF(unicycle_configuration_estimated, unicycle_covariance_estimated, control_input, sampling_interval, process_noise_covariance, landmarks, measurements, measurements_noise_covariance, measurements_info)
     [unicycle_configuration_predicted, unicycle_covariance_predicted] = EKF_predict(unicycle_configuration_estimated, unicycle_covariance_estimated, control_input, sampling_interval, process_noise_covariance);
-    [unicycle_configuration_corrected, unicycle_covariance_corrected] = EKF_correct(unicycle_configuration_predicted, unicycle_covariance_predicted, landmarks_position, measurements, measurements_noise_covariance, measurements_type);
+    [unicycle_configuration_corrected, unicycle_covariance_corrected] = EKF_correct(unicycle_configuration_predicted, unicycle_covariance_predicted, landmarks, measurements, measurements_noise_covariance, measurements_info);
 end
