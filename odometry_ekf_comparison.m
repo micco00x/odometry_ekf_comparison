@@ -4,7 +4,7 @@ close all
 
 % Simulation hparams:
 simulation_duration = 25.0; % [s]
-sampling_interval = 0.001; % [s]
+sampling_interval = 0.01; % [s]
 iterations = simulation_duration / sampling_interval;
 measurements_type = [MeasurementType.Bearing; MeasurementType.Distance; MeasurementType.Bearing; MeasurementType.Distance]; % Bearing or Distance
 
@@ -12,10 +12,10 @@ measurements_type = [MeasurementType.Bearing; MeasurementType.Distance; Measurem
 unicycle_configuration = zeros(3, 1); % [m], [m], [rad]
 
 % Commands to be applied to the unicycle
-control_input = [1.0; 0.1]; % [m/s], [rad/s]
+control_input = [1.0; 0.2]; % [m/s], [rad/s]
 
 % Position of the landmark:
-landmarks_position = [[7.0, 3.0]; [7.0, 3.0]; [19.0, -4.0]; [19.0, -4.0]];
+landmarks_position = [[7.0, 3.0]; [7.0, 3.0]; [-2.0, 5.0]; [-2.0, 5.0]];
 
 % ASSERT: double check sizes.
 num_measurements = size(measurements_type, 1);
@@ -25,7 +25,7 @@ assert(size(measurements_type, 1) == size(landmarks_position, 1));
 unicycle_configuration_estimated_with_odometry = unicycle_configuration;
 unicycle_configuration_estimated_with_ekf = unicycle_configuration;
 unicycle_covariance_ekf = 1e-3 * eye(3, 3);
-process_noise_covariance = diag([1e-6, 1e-6, 1e-7]);
+process_noise_covariance = diag([1e-5, 1e-5, 1e-5]);
 bearing_measurement_noise_covariance = 1e-5;
 distance_measurement_noise_covariance = 1e-5;
 measurements_noise_covariance = zeros(num_measurements);
@@ -80,7 +80,7 @@ figure
 plot_configuration_comparison(time, unicycle_configuration_log, unicycle_configuration_ekf_log, 'ground truth', 'EKF');
 
 % Unicycle plot:
-num_unicycles_to_draw = 10;
+num_unicycles_to_draw = 20;
 figure
 scatter(landmarks_position(:, 1), landmarks_position(:, 2));
 hold on
@@ -89,7 +89,7 @@ hold on
 draw_unicycle_from_trajectory(unicycle_configuration_odometry_log, num_unicycles_to_draw, 'red');
 hold on
 draw_unicycle_from_trajectory(unicycle_configuration_ekf_log, num_unicycles_to_draw, 'green');
-legend('landmark', 'ground truth', 'odometric localization', 'EKF', 'Location', 'northwest');
+legend('landmark', 'ground truth', 'odometric localization', 'EKF', 'Location', 'northeast');
 
 % Process noise plot:
 figure
