@@ -59,9 +59,9 @@ measurements_noise_log = zeros(iterations, num_measurements);
 measurements_log = zeros(iterations, num_measurements);
 
 % Run simulation:
+process_noise = zeros(3, 1);
 for iter = 1:iterations
-    % Simulation step:
-    [unicycle_configuration, process_noise] = simulate_unicycle_motion(unicycle_configuration, control_input, sampling_interval, process_noise_covariance);
+    % Read measurements from sensors:
     [measurements, measurements_noise] = read_measurements(unicycle_configuration, landmarks, measurements_info, bearing_measurement_noise_covariance, distance_measurement_noise_covariance);
 
     % Odometric localization:
@@ -77,6 +77,9 @@ for iter = 1:iterations
     process_noise_log(iter, :) = process_noise;
     measurements_noise_log(iter, :) = measurements_noise;
     measurements_log(iter, :) = measurements;
+
+    % Simulation step:
+    [unicycle_configuration, process_noise] = simulate_unicycle_motion(unicycle_configuration, control_input, sampling_interval, process_noise_covariance);
 end
 
 % Plots:
