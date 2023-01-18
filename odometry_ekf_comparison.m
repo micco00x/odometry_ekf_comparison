@@ -34,6 +34,10 @@ measurements_info = [
 ];
 num_measurements = size(measurements_info, 1);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% DO NOT MODIFY ANYTHING BELOW UNLESS YOU KNOW WHAT YOU ARE DOING %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Odometric localization and EKF data:
 unicycle_configuration_estimated_with_odometry = unicycle_configuration;
 unicycle_configuration_estimated_with_ekf = unicycle_configuration;
